@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+数据库初始化脚本 - PostgreSQL版本
+"""
+
+import os
+import sys
+
+# 添加项目根目录到Python路径
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from flask import Flask
+from app.models.database import db
+from config.settings import DevelopmentConfig
+
+def init_db():
+    """初始化数据库"""
+    app = Flask('{{ project_name }}')
+    app.config.from_object(DevelopmentConfig)
+    
+    # 初始化数据库连接
+    db.init_app(app)
+    
+    with app.app_context():
+        # 创建所有表
+        db.create_all()
+        print("数据库表创建成功!")
+        
+        # 这里可以添加初始数据
+        # 例如: 添加管理员用户
+        # from app.models.user import User
+        # admin = User(username='admin', email='admin@example.com')
+        # admin.set_password('admin123')
+        # db.session.add(admin)
+        # db.session.commit()
+        # print("管理员用户创建成功!")
+
+if __name__ == '__main__':
+    print("正在初始化PostgreSQL数据库...")
+    init_db()
+    print("数据库初始化完成!")

@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Pytest配置
+
+这个模块提供了Pytest的配置和通用fixture。
+"""
+
+import asyncio
+from typing import AsyncGenerator, Dict, Generator
+
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+
+from config.settings import settings
+from app.db.base import Base
+from app.db.session import get_db
+from app.main import app
+{% if use_auth %}
+from app.models.user import User
+from app.schemas.user import UserCreate
+from app.crud.user import user_crud
+{% endif %}
+
+# 测试数据库URL
+{% if database == 'mysql' %}
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL.replace(
+    "mysql", "mysql+aiomysql", 1
+).replace("/{{ project_name }}", "/test_{{ project_name }}")
+{% else %}
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL.replace(
+    "/{{ project_name }}", "/test_{{ project_name }}"
+)
+{% endif %}
+
+# 创建测试引擎
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, future=True)
+TestingSessionLocal = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
+
+
+@pytest.fixture(scope="session")
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
+    """
+    创建事件循环
+    """
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session")
+async def setup_database() -> None:
+    """
+    设置测试数据库
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+
+@pytest.fixture
+async def db_session(setup_database) -> AsyncGenerator[AsyncSession, None]:
+    """
+    获取测试数据库会话
+    """
+    async with TestingSessionLocal() as session:
+        yield session
+        # 回滚事务
+        await session.rollback()
+
+
+@pytest.fixture
+async def client(db_session) -> AsyncGenerator[TestClient, None]:
+    """
+    获取测试客户端
+    """
+    # 依赖覆盖
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        yield db_session
+    
+    # 创建应用
+    app.dependency_overrides[get_db] = override_get_db
+    
+    # 创建测试客户端
+    with TestClient(app) as test_client:
+        yield test_client
+
+{% if use_auth %}
+@pytest.fixture
+async def test_user(db_session: AsyncSession) -> User:
+    """
+    创建测试用户
+    """
+    user_in = UserCreate(
+        username="testuser",
+        email="test@example.com",
+        password="testpassword",
+    )
+    
+    # 检查用户是否已存在
+    user = await user_crud.get_by_email(db_session, email=user_in.email)
+    if user:
+        return user
+    
+    # 创建用户
+    user = await user_crud.create(db_session, obj_in=user_in)
+    return user
+
+
+@pytest.fixture
+async def test_superuser(db_session: AsyncSession) -> User:
+    """
+    创建测试超级用户
+    """
+    user_in = UserCreate(
+        username="testsuperuser",
+        email="testsuperuser@example.com",
+        password="testpassword",
+        is_superuser=True,
+    )
+    
+    # 检查用户是否已存在
+    user = await user_crud.get_by_email(db_session, email=user_in.email)
+    if user:
+        return user
+    
+    # 创建用户
+    user = await user_crud.create(db_session, obj_in=user_in)
+    return user
+
+
+@pytest.fixture
+async def test_auth_headers(client: TestClient, test_user: User) -> Dict[str, str]:
+    """
+    获取测试认证头
+    """
+    # 登录获取令牌
+    login_data = {
+        "username": test_user.username,
+        "password": "testpassword",
+    }
+    response = client.post(
+        f"{settings.API_V1_STR}/auth/login",
+        data=login_data,
+    )
+    tokens = response.json()
+    
+    # 创建认证头
+    auth_headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+    return auth_headers
+
+
+@pytest.fixture
+async def test_superuser_auth_headers(client: TestClient, test_superuser: User) -> Dict[str, str]:
+    """
+    获取测试超级用户认证头
+    """
+    # 登录获取令牌
+    login_data = {
+        "username": test_superuser.username,
+        "password": "testpassword",
+    }
+    response = client.post(
+        f"{settings.API_V1_STR}/auth/login",
+        data=login_data,
+    )
+    tokens = response.json()
+    
+    # 创建认证头
+    auth_headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+    return auth_headers
+{% endif %}

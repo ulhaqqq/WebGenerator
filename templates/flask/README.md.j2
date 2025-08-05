@@ -1,0 +1,127 @@
+# {{ project_name }}
+
+## 项目简介
+
+这是一个使用Flask框架构建的企业级Web应用。
+
+## 技术栈
+
+- **Web框架**: Flask
+- **数据库**: {% if database == 'mysql' %}MySQL{% else %}PostgreSQL{% endif %}
+{% if use_redis %}
+- **缓存**: Redis
+{% endif %}
+
+- **文档**: Swagger/OpenAPI
+- **测试**: Pytest
+{% if use_docker %}
+- **容器化**: Docker & Docker Compose
+{% endif %}
+
+## 项目结构
+
+```
+{{ project_name }}/
+├── app/                    # 应用包
+│   ├── __init__.py         # 应用初始化
+│   ├── api/                # API包
+│   │   ├── __init__.py     # API初始化
+│   │   └── routes.py       # API路由
+│   ├── models/             # 模型包
+│   │   ├── __init__.py     # 模型初始化
+│   │   ├── base.py         # 基础模型
+│   │   └── database.py     # 数据库配置
+│   └── utils/              # 工具包
+│       └── __init__.py     # 工具初始化
+{% if use_redis %}│       └── redis_client.py  # Redis客户端
+{% endif %}├── config/                 # 配置包
+│   ├── __init__.py         # 配置初始化
+│   └── settings.py         # 配置设置
+├── logs/                   # 日志目录
+├── tests/                  # 测试包
+│   ├── __init__.py         # 测试初始化
+│   ├── conftest.py         # Pytest配置
+│   └── test_api.py         # API测试
+├── .env                    # 环境变量
+├── .gitignore              # Git忽略文件
+{% if use_docker %}├── Dockerfile              # Docker配置
+├── docker-compose.yml      # Docker Compose配置
+{% endif %}├── requirements.txt        # 依赖列表
+└── run.py                  # 应用入口点
+```
+
+## 安装
+
+1. 克隆仓库
+
+```bash
+git clone <repository-url>
+cd {{ project_name }}
+```
+
+2. 创建虚拟环境
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate  # Windows
+```
+
+3. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+4. 配置环境变量
+
+编辑`.env`文件（已自动生成），并根据需要修改配置。
+
+```bash
+# .env 文件已自动生成，直接编辑即可
+```
+
+5. 初始化数据库
+
+```bash
+flask db init
+flask db migrate
+flask db upgrade
+```
+
+## 运行
+
+### 开发模式
+
+```bash
+flask run
+```
+
+或者
+
+```bash
+python run.py
+```
+
+{% if use_docker %}
+### 使用Docker
+
+```bash
+docker-compose up -d
+```
+{% endif %}
+
+## 测试
+
+```bash
+pytest
+```
+
+## API文档
+
+启动应用后，访问 http://localhost:5000/api/docs 查看API文档。
+
+## 许可证
+
+[MIT](LICENSE)

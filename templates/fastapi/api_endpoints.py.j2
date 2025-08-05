@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+API端点
+
+这个模块定义了API端点。
+"""
+
+from fastapi import APIRouter, Depends, HTTPException
+{% if include_auth %}
+from app.api.deps import get_current_user
+{% endif %}
+
+router = APIRouter()
+
+
+@router.get("/")
+async def root():
+    """
+    API根路径
+    """
+    return {"message": "Welcome to {{ project_name }} API"}
+
+
+@router.get("/health")
+async def health_check():
+    """
+    健康检查端点
+    """
+    return {"status": "ok"}
+
+
+{% if include_auth %}
+@router.get("/protected")
+async def protected_route(current_user = Depends(get_current_user)):
+    """
+    受保护的路由示例
+    """
+    return {"message": "This is a protected route", "user": current_user}
+{% endif %}

@@ -1,0 +1,208 @@
+# {{ project_name }}
+
+## 项目简介
+
+{{ project_name }} 是一个基于 FastAPI 的 RESTful API 项目。
+
+## 技术栈
+
+- **FastAPI**: 现代、快速（高性能）的 Web 框架
+- **SQLAlchemy**: Python SQL 工具包和 ORM
+- **Pydantic**: 数据验证和设置管理
+- **Alembic**: 数据库迁移工具
+{% if db_type == 'mysql' %}
+- **MySQL**: 关系型数据库
+{% elif db_type == 'postgresql' %}
+- **PostgreSQL**: 关系型数据库
+{% endif %}
+{% if use_redis %}
+- **Redis**: 内存数据结构存储
+{% endif %}
+- **OpenAPI**: API 文档
+- **Pytest**: 测试框架
+- **Docker**: 容器化部署
+
+## 项目结构
+
+```
+{{ project_name }}/
+├── app/                    # 应用目录
+│   ├── api/                # API 路由
+│   │   └── v1/             # API v1 版本
+│   │       ├── endpoints/  # API 端点
+│   │       └── api.py      # API 路由注册
+│   ├── core/               # 核心模块
+│   │   └── config.py       # 配置模块
+│   ├── crud/               # CRUD 操作
+│   ├── db/                 # 数据库模块
+│   │   ├── base.py         # 数据库基类
+│   │   └── session.py      # 数据库会话
+│   ├── models/             # 数据库模型
+│   ├── schemas/            # Pydantic 模式
+│   └── main.py             # 应用入口
+├── tests/                  # 测试目录
+├── alembic/                # 数据库迁移
+├── .env                    # 环境变量
+├── Dockerfile              # Docker 配置
+├── docker-compose.yml      # Docker Compose 配置
+└── requirements.txt        # 依赖包
+```
+
+## 安装
+
+### 前提条件
+
+- Python 3.9+
+{% if db_type == 'mysql' %}
+- MySQL
+{% elif db_type == 'postgresql' %}
+- PostgreSQL
+{% endif %}
+{% if use_redis %}
+- Redis
+{% endif %}
+- Docker (可选)
+
+### 本地安装
+
+1. 克隆仓库
+
+```bash
+git clone <repository-url>
+cd {{ project_name }}
+```
+
+2. 创建虚拟环境
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# 或
+venv\Scripts\activate  # Windows
+```
+
+3. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+4. 设置环境变量
+
+```bash
+# 编辑 .env 文件设置环境变量（已自动生成）
+```
+
+{% if db_type == 'mysql' %}
+**重要：MySQL 数据库配置**
+
+在运行迁移之前，请确保：
+1. MySQL 服务已启动
+2. 创建了对应的数据库：
+   ```sql
+   CREATE DATABASE {{ project_name }};
+   ```
+3. 在 `.env` 文件中正确配置数据库连接信息：
+   ```
+   DATABASE_USER=your_mysql_username
+   DATABASE_PASSWORD=your_mysql_password
+   DATABASE_NAME={{ project_name }}
+   DATABASE_URL=mysql+aiomysql://your_mysql_username:your_mysql_password@localhost:3306/{{ project_name }}
+   ```
+{% elif db_type == 'postgresql' %}
+**重要：PostgreSQL 数据库配置**
+
+在运行迁移之前，请确保：
+1. PostgreSQL 服务已启动
+2. 创建了对应的数据库：
+   ```sql
+   CREATE DATABASE {{ project_name }};
+   ```
+3. 在 `.env` 文件中正确配置数据库连接信息：
+   ```
+   DATABASE_USER=your_postgres_username
+   DATABASE_PASSWORD=your_postgres_password
+   DATABASE_NAME={{ project_name }}
+   DATABASE_URL=postgresql+asyncpg://your_postgres_username:your_postgres_password@localhost:5432/{{ project_name }}
+   ```
+{% endif %}
+
+5. 初始化并运行数据库迁移
+
+```bash
+# 初始化alembic（如果尚未初始化）
+alembic init -t async alembic
+
+# 创建迁移脚本
+alembic revision --autogenerate -m "initial"
+
+# 应用迁移
+alembic upgrade head
+```
+
+**故障排除：**
+
+如果遇到 "Can't locate revision identified by 'xxx'" 错误：
+1. 删除 `alembic/versions/` 目录下的所有文件
+2. 重新创建迁移：
+   ```bash
+   alembic revision --autogenerate -m "initial"
+   alembic upgrade head
+   ```
+
+如果遇到数据库连接错误：
+1. 确保数据库服务正在运行
+2. 检查 `.env` 文件中的数据库连接配置
+3. 确保数据库已创建且用户有访问权限
+
+**快速重置数据库和迁移（解决迁移冲突）：**
+```bash
+python scripts/reset_db.py
+```
+此脚本将清理所有迁移文件并重置数据库，然后按提示重新运行迁移命令。
+
+{% if include_auth %}
+6. 初始化数据库（创建默认管理员用户）
+
+```bash
+python scripts/db_init.py
+```
+
+**默认管理员账户信息：**
+- 用户名：`admin`
+- 密码：`admin`
+- 邮箱：`admin@example.com`
+
+⚠️ **安全提醒**：请在生产环境中立即修改默认密码！
+{% endif %}
+
+## 运行
+
+### 开发模式
+
+```bash
+uvicorn app.main:app --reload
+```
+
+### 使用 Docker
+
+```bash
+docker-compose up -d
+```
+
+## 测试
+
+```bash
+pytest
+```
+
+## API 文档
+
+启动应用后，可以访问以下 URL 查看 API 文档：
+
+- Swagger UI: http://localhost:8000/api/docs
+- ReDoc: http://localhost:8000/api/redoc
+
+## 许可证
+
+[MIT](LICENSE)

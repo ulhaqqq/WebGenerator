@@ -1,0 +1,44 @@
+# app/models/database.py
+
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declarative_base
+
+# 初始化SQLAlchemy实例
+db = SQLAlchemy()
+
+# 创建Base类，所有模型都将继承这个类
+Base = declarative_base()
+
+# 数据库会话
+Session = db.session
+
+def init_db(app):
+    """
+    初始化数据库连接
+    
+    Args:
+        app: Flask应用实例
+    """
+    db.init_app(app)
+    
+    # 在应用上下文中创建所有表
+    with app.app_context():
+        db.create_all()
+
+def get_db():
+    """
+    获取数据库会话
+    
+    Returns:
+        SQLAlchemy会话对象
+    """
+    return Session
+
+def close_db(e=None):
+    """
+    关闭数据库会话
+    
+    Args:
+        e: 可选的异常对象
+    """
+    Session.remove()

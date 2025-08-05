@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+应用配置模块
+
+这个模块定义了应用的配置类。
+"""
+
+import os
+
+
+
+class BaseConfig:
+    """基础配置类"""
+    
+    # 应用配置
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
+    DEBUG = False
+    TESTING = False
+    
+    # 数据库配置
+    {% if database == 'mysql' %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+pymysql://user:password@localhost/{{ project_name }}')
+    {% elif database == 'postgresql' %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost/{{ project_name }}')
+    {% else %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///{{ project_name }}.db')
+    {% endif %}
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    {% if use_redis %}
+    # Redis配置
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    {% endif %}
+    
+
+    
+    # 日志配置
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_DIR = os.getenv('LOG_DIR', 'logs')
+
+
+class DevelopmentConfig(BaseConfig):
+    """开发环境配置"""
+    
+    DEBUG = True
+    LOG_LEVEL = 'DEBUG'
+
+
+class TestingConfig(BaseConfig):
+    """测试环境配置"""
+    
+    TESTING = True
+    {% if database == 'mysql' %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL', 'mysql+pymysql://user:password@localhost/{{ project_name }}_test')
+    {% elif database == 'postgresql' %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL', 'postgresql://user:password@localhost/{{ project_name }}_test')
+    {% else %}
+    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL', 'sqlite:///test_{{ project_name }}.db')
+    {% endif %}
+
+
+class ProductionConfig(BaseConfig):
+    """生产环境配置"""
+    
+    def __init__(self):
+        super().__init__()
+        self.SECRET_KEY = os.getenv('SECRET_KEY')
+        
+        # 确保在生产环境中设置了密钥
+        if not self.SECRET_KEY:
+            raise ValueError("在生产环境中必须设置SECRET_KEY环境变量")
+    
+    SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key')

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -e
+
+# 创建项目目录结构
+mkdir -p app/api/v1
+mkdir -p app/core
+mkdir -p app/crud
+mkdir -p app/db
+mkdir -p app/models
+mkdir -p app/schemas
+mkdir -p app/utils
+mkdir -p app/tests
+mkdir -p alembic
+mkdir -p alembic/versions
+
+# 创建初始化文件
+touch app/__init__.py
+touch app/api/__init__.py
+touch app/api/v1/__init__.py
+touch app/core/__init__.py
+touch app/crud/__init__.py
+touch app/db/__init__.py
+touch app/models/__init__.py
+touch app/schemas/__init__.py
+touch app/utils/__init__.py
+touch app/tests/__init__.py
+
+# 初始化alembic
+alembic init -t async alembic
+
+# .env 文件已自动生成，无需创建示例文件
+
+# 初始化git仓库
+git init
+cp gitignore .gitignore
+
+echo "项目初始化完成！"
+echo "请运行以下命令安装依赖："
+echo "pip install -r requirements.txt"
+echo "然后运行以下命令启动开发服务器："
+echo "uvicorn app.main:app --reload"

@@ -1,0 +1,58 @@
+/**
+ * 主JavaScript文件
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('{{ project_name }} 应用已加载');
+    
+    // 添加交互效果
+    const navLinks = document.querySelectorAll('.nav-links a');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.textDecoration = 'underline';
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            this.style.textDecoration = 'none';
+        });
+    });
+    
+    // 表单验证
+    const forms = document.querySelectorAll('form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                    
+                    // 创建错误消息
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'error-message';
+                    errorMsg.textContent = '此字段为必填项';
+                    
+                    // 如果还没有错误消息，则添加
+                    if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('error-message')) {
+                        field.parentNode.insertBefore(errorMsg, field.nextSibling);
+                    }
+                } else {
+                    field.classList.remove('error');
+                    
+                    // 移除错误消息
+                    if (field.nextElementSibling && field.nextElementSibling.classList.contains('error-message')) {
+                        field.parentNode.removeChild(field.nextElementSibling);
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+});

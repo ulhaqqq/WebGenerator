@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11998e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38ef7d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆角矩形 -->
+  <rect x="32" y="32" width="448" height="448" rx="80" ry="80" fill="url(#bgGradient)" stroke="none"/>
+  
+  <!-- 主图标 - 代码符号 -->
+  <g transform="translate(256,256)">
+    <!-- 左括号 -->
+    <path d="M-120,-80 Q-140,-80 -140,-60 L-140,60 Q-140,80 -120,80" 
+          stroke="url(#iconGradient)" stroke-width="16" fill="none" stroke-linecap="round"/>
+    
+    <!-- 右括号 -->
+    <path d="M120,-80 Q140,-80 140,-60 L140,60 Q140,80 120,80" 
+          stroke="url(#iconGradient)" stroke-width="16" fill="none" stroke-linecap="round"/>
+    
+    <!-- 中间的斜杠 -->
+    <line x1="-40" y1="-100" x2="40" y2="100" 
+          stroke="url(#iconGradient)" stroke-width="12" stroke-linecap="round"/>
+    
+    <!-- 装饰性点 -->
+    <circle cx="-60" cy="0" r="8" fill="url(#iconGradient)"/>
+    <circle cx="60" cy="0" r="8" fill="url(#iconGradient)"/>
+  </g>
+  
+  <!-- 底部装饰 - 表示Web -->
+  <g transform="translate(256,400)">
+    <!-- 网络连接线 -->
+    <circle cx="-80" cy="0" r="12" fill="url(#iconGradient)"/>
+    <circle cx="0" cy="0" r="12" fill="url(#iconGradient)"/>
+    <circle cx="80" cy="0" r="12" fill="url(#iconGradient)"/>
+    
+    <line x1="-68" y1="0" x2="-12" y2="0" 
+          stroke="url(#iconGradient)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="12" y1="0" x2="68" y2="0" 
+          stroke="url(#iconGradient)" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 顶部装饰 - 表示生成器 -->
+  <g transform="translate(256,120)">
+    <!-- 齿轮图标 -->
+    <circle cx="0" cy="0" r="24" fill="none" stroke="url(#iconGradient)" stroke-width="6"/>
+    <circle cx="0" cy="0" r="8" fill="url(#iconGradient)"/>
+    
+    <!-- 齿轮齿 -->
+    <rect x="-4" y="-32" width="8" height="16" fill="url(#iconGradient)" rx="2"/>
+    <rect x="-4" y="16" width="8" height="16" fill="url(#iconGradient)" rx="2"/>
+    <rect x="16" y="-4" width="16" height="8" fill="url(#iconGradient)" rx="2"/>
+    <rect x="-32" y="-4" width="16" height="8" fill="url(#iconGradient)" rx="2"/>
+  </g>
+</svg>

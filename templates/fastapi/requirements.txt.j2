@@ -1,0 +1,41 @@
+# FastAPI框架及其扩展
+fastapi>=0.100.0,<0.120.0
+uvicorn>=0.22.0,<0.25.0
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0,<3.0.0
+pydantic[email]>=2.0.0,<3.0.0
+python-multipart>=0.0.6,<0.1.0
+
+# 数据库
+sqlalchemy>=2.0.9,<2.1.0
+greenlet>=3.0.0,<4.0.0
+{% if db_type == 'mysql' %}
+aiomysql>=0.1.1,<0.2.0
+{% elif db_type == 'postgresql' %}
+asyncpg>=0.27.0,<0.28.0
+{% else %}
+# SQLite异步驱动（默认）
+aiosqlite>=0.19.0,<0.20.0
+{% endif %}
+alembic>=1.10.3,<1.11.0
+
+# 安全
+passlib>=1.7.4,<1.8.0
+python-jose>=3.3.0,<3.4.0
+cryptography>=40.0.2,<41.0.0
+bcrypt>=4.0.1,<4.1.0
+
+{% if use_redis %}
+# Redis
+redis>=4.5.4,<4.6.0
+{% endif %}
+
+# 工具
+python-dotenv>=1.0.0,<1.1.0
+tenacity>=8.2.2,<8.3.0
+email-validator>=2.0.0,<2.1.0
+
+# 测试
+pytest>=7.3.1,<7.4.0
+pytest-asyncio>=0.21.0,<0.22.0
+httpx>=0.24.0,<0.25.0

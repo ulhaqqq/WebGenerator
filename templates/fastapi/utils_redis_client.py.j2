@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Redis客户端模块
+
+这个模块提供了Redis缓存操作的工具函数。
+"""
+
+import json
+import pickle
+from typing import Any, Optional, Union
+from fastapi import Depends
+import redis
+from config.settings import settings
+
+# 创建Redis连接池
+_redis_client = None
+
+
+def get_redis_client() -> redis.Redis:
+    """
+    获取Redis客户端
+    
+    Returns:
+        redis.Redis: Redis客户端实例
+    """
+    global _redis_client
+    if _redis_client is None:
+        _redis_client = redis.Redis.from_url(
+            settings.REDIS_URL,
+            decode_responses=False
+        )
+    return _redis_client
+
+
+async def get_redis_async():
+    """
+    获取Redis客户端（异步依赖注入）
+    
+    Yields:
+        redis.Redis: Redis客户端实例
+    """
+    client = get_redis_client()
+    yield client
+
+
+def cache_set(key: str, value: Any, expire: int = 3600) -> bool:
+    """
+    设置缓存
+    
+    Args:
+        key (str): 缓存键
+        value (Any): 缓存值
+        expire (int, optional): 过期时间（秒）。默认为3600秒（1小时）。
+        
+    Returns:
+        bool: 是否成功
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 序列化值
+        if isinstance(value, (str, int, float, bool)):
+            # 简单类型使用JSON序列化
+            serialized_value = json.dumps(value).encode('utf-8')
+            prefix = b'json:'
+        else:
+            # 复杂类型使用Pickle序列化
+            serialized_value = pickle.dumps(value)
+            prefix = b'pickle:'
+        
+        # 存储值
+        client.set(
+            key,
+            prefix + serialized_value,
+            ex=expire
+        )
+        
+        return True
+    except Exception as e:
+        import logging
+        logging.error(f"缓存设置失败: {str(e)}")
+        return False
+
+
+def cache_get(key: str, default: Any = None) -> Any:
+    """
+    获取缓存
+    
+    Args:
+        key (str): 缓存键
+        default (Any, optional): 默认值。默认为None。
+        
+    Returns:
+        Any: 缓存值或默认值
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 获取值
+        value = client.get(key)
+        if value is None:
+            return default
+        
+        # 反序列化值
+        if value.startswith(b'json:'):
+            # JSON反序列化
+            return json.loads(value[5:].decode('utf-8'))
+        elif value.startswith(b'pickle:'):
+            # Pickle反序列化
+            return pickle.loads(value[7:])
+        else:
+            # 未知格式，返回原始值
+            return value
+    except Exception as e:
+        import logging
+        logging.error(f"缓存获取失败: {str(e)}")
+        return default
+
+
+def cache_delete(key: str) -> bool:
+    """
+    删除缓存
+    
+    Args:
+        key (str): 缓存键
+        
+    Returns:
+        bool: 是否成功
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 删除键
+        client.delete(key)
+        
+        return True
+    except Exception as e:
+        import logging
+        logging.error(f"缓存删除失败: {str(e)}")
+        return False
+
+
+def cache_exists(key: str) -> bool:
+    """
+    检查缓存是否存在
+    
+    Args:
+        key (str): 缓存键
+        
+    Returns:
+        bool: 是否存在
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 检查键是否存在
+        return bool(client.exists(key))
+    except Exception as e:
+        import logging
+        logging.error(f"缓存检查失败: {str(e)}")
+        return False
+
+
+def cache_ttl(key: str) -> Optional[int]:
+    """
+    获取缓存过期时间
+    
+    Args:
+        key (str): 缓存键
+        
+    Returns:
+        Optional[int]: 过期时间（秒）或None（如果键不存在）
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 获取过期时间
+        ttl = client.ttl(key)
+        return ttl if ttl > 0 else None
+    except Exception as e:
+        import logging
+        logging.error(f"缓存TTL获取失败: {str(e)}")
+        return None
+
+
+def cache_clear() -> bool:
+    """
+    清空所有缓存
+    
+    Returns:
+        bool: 是否成功
+    """
+    try:
+        # 获取Redis客户端
+        client = get_redis_client()
+        
+        # 清空数据库
+        client.flushdb()
+        
+        return True
+    except Exception as e:
+        import logging
+        logging.error(f"缓存清空失败: {str(e)}")
+        return False

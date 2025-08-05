@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+# 创建项目目录结构
+mkdir -p app/api
+
+mkdir -p app/config
+mkdir -p app/models
+mkdir -p app/utils
+mkdir -p app/tests
+mkdir -p migrations
+
+# 创建初始化文件
+touch app/__init__.py
+touch app/api/__init__.py
+
+touch app/config/__init__.py
+touch app/models/__init__.py
+touch app/utils/__init__.py
+touch app/tests/__init__.py
+
+# .env 文件已自动生成，无需创建示例文件
+
+# 初始化git仓库
+git init
+cp gitignore .gitignore
+
+echo "项目初始化完成！"
+echo "请运行以下命令安装依赖："
+echo "pip install -r requirements.txt"
+echo "然后运行以下命令初始化数据库："
+echo "export FLASK_APP=run.py"
+echo "flask db init"
+echo "flask db migrate -m \"Initial migration\""
+echo "flask db upgrade"
+echo "最后运行以下命令启动开发服务器："
+echo "python run.py"

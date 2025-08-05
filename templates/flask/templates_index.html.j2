@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name }} - 首页</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- 额外的CSS可以在这里添加 -->
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">{{ project_name }}</div>
+            <ul class="nav-links">
+                <li><a href="/">首页</a></li>
+                <li><a href="/api">API</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+    <div class="container">
+        <h1>欢迎使用 {{ project_name }}</h1>
+        <p>这是一个由Flask框架生成的Web应用。</p>
+        
+        <div class="features">
+            <h2>功能特点</h2>
+            <ul>
+                <li>模块化结构</li>
+                <li>RESTful API支持</li>
+                <li>数据库集成</li>
+                {% if use_redis %}
+                <li>Redis缓存支持</li>
+                {% endif %}
+
+            </ul>
+        </div>
+        
+        <div class="getting-started">
+            <h2>开始使用</h2>
+            <p>请查看项目的README.md文件获取更多信息。</p>
+        </div>
+    </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; {{ project_name }} - 版权所有</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

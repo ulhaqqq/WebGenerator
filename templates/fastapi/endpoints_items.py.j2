@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+项目API端点
+
+这个模块提供了项目的CRUD API端点。
+"""
+
+from typing import Any, List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import get_db
+from app.models.item import Item
+from app.schemas.item import ItemCreate, ItemResponse, ItemUpdate
+from app.crud.item import item_crud
+
+router = APIRouter()
+
+
+@router.get("/", response_model=List[ItemResponse])
+async def read_items(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    获取项目列表
+    """
+    items = await item_crud.get_multi(db, skip=skip, limit=limit)
+    return items
+
+
+@router.post("/", response_model=ItemResponse, status_code=status.HTTP_201_CREATED)
+async def create_item(
+    *,
+    item_in: ItemCreate,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    创建新项目
+    """
+    item = await item_crud.create(db, obj_in=item_in)
+    return item
+
+
+@router.get("/{item_id}", response_model=ItemResponse)
+async def read_item(
+    *,
+    item_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    获取指定项目
+    """
+    item = await item_crud.get(db, id=item_id)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+    return item
+
+
+@router.put("/{item_id}", response_model=ItemResponse)
+async def update_item(
+    *,
+    item_id: int,
+    item_in: ItemUpdate,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    更新指定项目
+    """
+    item = await item_crud.get(db, id=item_id)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+    item = await item_crud.update(db, db_obj=item, obj_in=item_in)
+    return item
+
+
+@router.delete("/{item_id}", response_model=ItemResponse)
+async def delete_item(
+    *,
+    item_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    删除指定项目
+    """
+    item = await item_crud.get(db, id=item_id)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+    item = await item_crud.remove(db, id=item_id)
+    return item

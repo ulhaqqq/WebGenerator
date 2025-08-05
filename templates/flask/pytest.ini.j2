@@ -1,0 +1,24 @@
+[pytest]
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+
+# 测试路径
+testpaths = tests
+
+# 显示详细输出
+verbose = 2
+
+# 显示本地变量在失败的情况下
+showlocals = true
+
+# 禁用警告捕获
+filterwarnings =
+    ignore::DeprecationWarning
+    ignore::PendingDeprecationWarning
+
+# 日志级别
+log_cli = true
+log_cli_level = INFO
+log_cli_format = %(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)
+log_cli_date_format = %Y-%m-%d %H:%M:%S

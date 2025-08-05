@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+API路由模块
+
+这个模块负责组织和管理API路由。
+"""
+
+from fastapi import APIRouter
+
+{% if use_auth %}
+from app.api.v1.endpoints import auth, items, health
+{% else %}
+from app.api.v1.endpoints import items, health
+{% endif %}
+
+api_router = APIRouter()
+
+# 注册健康检查路由
+api_router.include_router(health.router, prefix="/health", tags=["health"])
+
+{% if use_auth %}
+# 注册认证路由
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+{% endif %}
+
+# 注册项目路由
+api_router.include_router(items.router, prefix="/items", tags=["items"])

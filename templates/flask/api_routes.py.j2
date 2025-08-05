@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+API路由模块
+
+这个模块定义了API的路由和处理函数。
+"""
+
+from flask import jsonify, request
+from app.api import api_bp
+
+
+
+@api_bp.route('/health', methods=['GET'])
+def health_check():
+    """
+    健康检查端点
+    ---
+    tags:
+      - 系统监控
+    responses:
+      200:
+        description: 服务状态正常
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "ok"
+            message:
+              type: string
+              example: "服务运行正常"
+    """
+    return jsonify({
+        "status": "ok",
+        "message": "服务运行正常"
+    })
+
+
+@api_bp.route('/info', methods=['GET'])
+def api_info():
+    """
+    API信息端点
+    ---
+    tags:
+      - 系统信息
+    responses:
+      200:
+        description: API基本信息
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "{{ project_name }} API"
+            version:
+              type: string
+              example: "1.0.0"
+            description:
+              type: string
+              example: "{{ project_name }} RESTful API"
+    """
+    return jsonify({
+        "name": "{{ project_name }} API",
+        "version": "1.0.0",
+        "description": "{{ project_name }} RESTful API"
+    })

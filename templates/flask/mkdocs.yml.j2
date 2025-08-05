@@ -1,0 +1,64 @@
+site_name: {{ project_name }} 文档
+site_description: {{ project_name }} 项目的技术文档
+site_author: {{ project_name }} 团队
+
+repo_name: {{ project_name }}
+repo_url: https://github.com/yourusername/{{ project_name }}
+
+theme:
+  name: material
+  language: zh
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.share
+
+nav:
+  - 首页: index.md
+  - API文档: api.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - pymdownx.arithmatex
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.tilde
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yourusername
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/yourusername
+
+extra_css:
+  - css/extra.css
+
+extra_javascript:
+  - js/extra.js
+
+plugins:
+  - search
+  - minify:
+      minify_html: true

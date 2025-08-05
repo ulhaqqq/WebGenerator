@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+辅助工具模块
+
+这个模块提供了各种辅助函数。
+"""
+
+
+def format_date(date_obj, format_str='%Y-%m-%d'):
+    """
+    格式化日期对象为字符串
+    
+    Args:
+        date_obj: 日期对象
+        format_str: 格式化字符串
+        
+    Returns:
+        格式化后的日期字符串
+    """
+    return date_obj.strftime(format_str) if date_obj else None
+
+
+def get_pagination_info(page, per_page, total_count):
+    """
+    获取分页信息
+    
+    Args:
+        page: 当前页码
+        per_page: 每页项目数
+        total_count: 总项目数
+        
+    Returns:
+        包含分页信息的字典
+    """
+    total_pages = (total_count + per_page - 1) // per_page
+    has_prev = page > 1
+    has_next = page < total_pages
+    
+    return {
+        'page': page,
+        'per_page': per_page,
+        'total_count': total_count,
+        'total_pages': total_pages,
+        'has_prev': has_prev,
+        'has_next': has_next
+    }

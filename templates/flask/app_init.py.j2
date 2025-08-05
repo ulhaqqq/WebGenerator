@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+应用初始化模块
+
+这个模块初始化Flask应用并配置所有必要的组件。
+"""
+
+import os
+from flask import Flask
+from flask_cors import CORS
+from flask_migrate import Migrate
+from flasgger import Swagger
+{% if use_redis %}
+from app.utils.redis_client import get_redis_client
+{% endif %}
+from app.models.database import db
+
+
+
+def create_app(config_name=None):
+    """
+    创建并配置Flask应用
+    
+    Args:
+        config_name (str, optional): 配置名称，可选值：development, testing, production
+        
+    Returns:
+        Flask: 配置好的Flask应用实例
+    """
+    # 创建应用实例
+    app = Flask(__name__)
+    
+    # 加载配置
+    config_name = config_name or os.getenv('FLASK_CONFIG', 'development')
+    app.config.from_object(f'config.settings.{config_name.capitalize()}Config')
+    
+    # 配置跨域
+    CORS(app)
+    
+    # 初始化数据库
+    db.init_app(app)
+    Migrate(app, db)
+    
+
+    
+    {% if use_redis %}
+    # 初始化Redis连接（在第一次使用时自动连接）
+    with app.app_context():
+        # 预热Redis连接
+        _ = get_redis_client()
+    {% endif %}
+    
+    # 配置Swagger文档
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": "apispec_1",
+                "route": "/apispec_1.json",
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/docs/"
+    }
+    
+    swagger_template = {
+        "swagger": "2.0",
+        "info": {
+            "title": "{{ project_name }} API",
+            "description": "{{ project_name }} RESTful API 文档",
+            "version": "1.0.0"
+        },
+        "consumes": ["application/json"],
+        "produces": ["application/json"]
+    }
+    
+    Swagger(app, config=swagger_config, template=swagger_template)
+    
+    # 注册蓝图
+    from app.api import api_bp
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
+    
+    # 注册错误处理
+    register_error_handlers(app)
+    
+    # 注册命令
+    register_commands(app)
+    
+    return app
+
+
+def register_error_handlers(app):
+    """
+    注册错误处理器
+    
+    Args:
+        app (Flask): Flask应用实例
+    """
+    @app.errorhandler(400)
+    def bad_request(error):
+        return {"error": "Bad request"}, 400
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return {"error": "Not found"}, 404
+    
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return {"error": "Internal server error"}, 500
+
+
+def register_commands(app):
+    """
+    注册自定义命令
+    
+    Args:
+        app (Flask): Flask应用实例
+    """
+    @app.cli.command("init-db")
+    def init_db():
+        """初始化数据库"""
+        db.create_all()
+        print("数据库表已创建。")

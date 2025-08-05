@@ -1,0 +1,12 @@
+[pytest]
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+
+# 显示详细输出
+addopts = -v
+
+# 禁用警告
+filterwarnings =
+    ignore::DeprecationWarning
+    ignore::PendingDeprecationWarning

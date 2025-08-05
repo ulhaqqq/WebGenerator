@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+数据库模型基类
+
+这个模块定义了所有数据库模型的基类。
+"""
+
+from datetime import datetime
+from typing import Any, Dict, List, Optional, TypeVar, Generic, Type
+
+from pydantic import BaseModel as PydanticBaseModel
+from sqlalchemy import Column, DateTime, Integer, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
+
+
+@as_declarative()
+class Base:
+    """
+    SQLAlchemy模型基类
+    """
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # 生成__tablename__
+    @declared_attr
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower()
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        将模型转换为字典
+        
+        Returns:
+            Dict[str, Any]: 模型的字典表示
+        """
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class BaseSchema(PydanticBaseModel):
+    """
+    Pydantic模型基类
+    """
+    
+    class Config:
+        orm_mode = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat(),
+        }
+
+
+ModelType = TypeVar("ModelType", bound=Base)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseSchema)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseSchema)
+
+
+class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
+    """
+    CRUD操作基类
+    """
+    
+    def __init__(self, model: Type[ModelType]):
+        """
+        初始化CRUD操作基类
+        
+        Args:
+            model: SQLAlchemy模型类
+        """
+        self.model = model
+    
+    async def get(self, db_session: AsyncSession, id: Any) -> Optional[ModelType]:
+        """
+        通过ID获取对象
+        
+        Args:
+            db_session: 数据库会话
+            id: 对象ID
+            
+        Returns:
+            Optional[ModelType]: 对象实例或None
+        """
+        query = select(self.model).where(self.model.id == id)
+        result = await db_session.execute(query)
+        return result.scalars().first()
+    
+    async def get_multi(
+        self, db_session: AsyncSession, *, skip: int = 0, limit: int = 100
+    ) -> List[ModelType]:
+        """
+        获取多个对象
+        
+        Args:
+            db_session: 数据库会话
+            skip: 跳过的记录数
+            limit: 返回的记录数
+            
+        Returns:
+            List[ModelType]: 对象列表
+        """
+        query = select(self.model).offset(skip).limit(limit)
+        result = await db_session.execute(query)
+        return result.scalars().all()
+    
+    async def create(self, db_session: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
+        """
+        创建对象
+        
+        Args:
+            db_session: 数据库会话
+            obj_in: 创建对象的数据
+            
+        Returns:
+            ModelType: 创建的对象实例
+        """
+        obj_in_data = obj_in.dict()
+        db_obj = self.model(**obj_in_data)
+        db_session.add(db_obj)
+        await db_session.commit()
+        await db_session.refresh(db_obj)
+        return db_obj
+    
+    async def update(
+        self, db_session: AsyncSession, *, db_obj: ModelType, obj_in: UpdateSchemaType
+    ) -> ModelType:
+        """
+        更新对象
+        
+        Args:
+            db_session: 数据库会话
+            db_obj: 要更新的对象实例
+            obj_in: 更新对象的数据
+            
+        Returns:
+            ModelType: 更新后的对象实例
+        """
+        obj_data = db_obj.to_dict()
+        update_data = obj_in.dict(exclude_unset=True)
+        for field in obj_data:
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+        db_session.add(db_obj)
+        await db_session.commit()
+        await db_session.refresh(db_obj)
+        return db_obj
+    
+    async def remove(self, db_session: AsyncSession, *, id: int) -> ModelType:
+        """
+        删除对象
+        
+        Args:
+            db_session: 数据库会话
+            id: 对象ID
+            
+        Returns:
+            ModelType: 删除的对象实例
+        """
+        query = select(self.model).where(self.model.id == id)
+        result = await db_session.execute(query)
+        obj = result.scalars().first()
+        if obj:
+            await db_session.delete(obj)
+            await db_session.commit()
+        return obj

@@ -1,0 +1,27 @@
+# 打包构建依赖
+# 用于将应用程序打包成可执行文件和安装包
+
+# 主要打包工具
+cx_Freeze>=6.15.0
+
+# macOS DMG 创建工具
+dmgbuild>=1.6.1
+
+# 备选打包工具
+pyinstaller>=5.13.0
+
+# Windows 特定依赖
+# pywin32>=306  # Windows 平台自动安装
+
+# 构建工具
+setuptools>=68.0.0
+wheel>=0.41.0
+
+# 图标处理
+pillow>=10.0.0
+
+# 文件处理
+patool>=1.12.0
+
+# 压缩工具
+py7zr>=0.20.0

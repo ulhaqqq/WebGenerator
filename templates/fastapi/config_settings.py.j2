@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+应用配置设置
+
+这个模块定义了应用的配置设置。
+"""
+
+import os
+from pydantic import Field
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+
+class Settings(BaseSettings):
+    """应用配置设置"""
+    # 应用设置
+    APP_NAME: str = "{{ project_name }}"
+    APP_VERSION: str = "0.1.0"
+    APP_ENV: str = Field(default="development", env="APP_ENV")
+    DEBUG: bool = Field(default=True, env="DEBUG")
+    SECRET_KEY: str = Field(default="{{ secret_key }}", env="SECRET_KEY")
+    
+    # API设置
+    API_PREFIX: str = "/api"
+    
+    # CORS设置
+    CORS_ORIGINS: list = ["*"]
+    CORS_METHODS: list = ["*"]
+    CORS_HEADERS: list = ["*"]
+    
+    {% if database in ['mysql', 'postgresql', 'sqlite', 'sqlalchemy'] %}
+    # 数据库设置
+    {% if database == 'mysql' %}
+    DATABASE_URL: str = Field(
+        default="mysql+aiomysql://root:password@localhost:3306/{{ project_name }}", 
+        env="DATABASE_URL"
+    )
+    {% elif database == 'postgresql' %}
+    DATABASE_URL: str = Field(
+        default="postgresql+asyncpg://user:password@localhost:5432/{{ project_name }}", 
+        env="DATABASE_URL"
+    )
+    {% else %}
+    DATABASE_URL: str = Field(
+        default="sqlite:///./app.db", 
+        env="DATABASE_URL"
+    )
+    {% endif %}
+    {% elif database == 'mongodb' %}
+    # MongoDB设置
+    MONGODB_URL: str = Field(
+        default="mongodb://localhost:27017", 
+        env="MONGODB_URL"
+    )
+    MONGODB_DB_NAME: str = Field(
+        default="{{ project_name }}", 
+        env="MONGODB_DB_NAME"
+    )
+    {% endif %}
+    
+    {% if use_redis %}
+    # Redis设置
+    REDIS_URL: str = Field(
+        default="redis://localhost:6379/0", 
+        env="REDIS_URL"
+    )
+    {% endif %}
+    
+    {% if include_auth %}
+    # 认证设置
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    ALGORITHM: str = "HS256"
+    {% endif %}
+    
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = True
+        extra = "allow"
+
+
+# 创建设置实例
+settings = Settings()

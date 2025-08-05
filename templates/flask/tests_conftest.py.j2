@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Pytest配置模块
+
+这个模块定义了Pytest的配置和通用fixture。
+"""
+
+import os
+import pytest
+from app import create_app
+from app.models.database import db as _db
+
+
+@pytest.fixture(scope='session')
+def app():
+    """创建应用实例"""
+    # 设置测试环境
+    os.environ['FLASK_ENV'] = 'testing'
+    
+    # 创建应用
+    app = create_app('testing')
+    
+    # 返回应用上下文
+    with app.app_context():
+        yield app
+
+
+@pytest.fixture(scope='session')
+def client(app):
+    """创建测试客户端"""
+    return app.test_client()
+
+
+@pytest.fixture(scope='session')
+def db(app):
+    """创建数据库"""
+    # 创建数据库表
+    _db.create_all()
+    
+    # 返回数据库
+    yield _db
+    
+    # 清理数据库
+    _db.drop_all()
+
+
+@pytest.fixture(scope='function')
+def session(db):
+    """创建数据库会话"""
+    # 创建会话
+    connection = db.engine.connect()
+    transaction = connection.begin()
+    session = db.create_scoped_session(options={"bind": connection, "binds": {}})
+    db.session = session
+    
+    # 返回会话
+    yield session
+    
+    # 清理会话
+    transaction.rollback()
+    connection.close()
+    session.remove()

@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      {% if db_type == 'mysql' %}
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME={{ project_name }}
+      {% elif db_type == 'postgresql' %}
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME={{ project_name }}
+      {% endif %}
+      {% if use_redis %}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      {% endif %}
+    depends_on:
+      - db
+      {% if use_redis %}
+      - redis
+      {% endif %}
+    volumes:
+      - ./:/app
+    restart: always
+
+  db:
+    {% if db_type == 'mysql' %}
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE={{ project_name }}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    {% elif db_type == 'postgresql' %}
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB={{ project_name }}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    {% endif %}
+
+  {% if use_redis %}
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+  {% endif %}
+
+volumes:
+  {% if db_type == 'mysql' %}
+  mysql_data:
+  {% elif db_type == 'postgresql' %}
+  postgres_data:
+  {% endif %}
+  {% if use_redis %}
+  redis_data:
+  {% endif %}

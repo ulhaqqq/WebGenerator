@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+FastAPI应用主模块
+
+这个模块是FastAPI应用的主模块，负责创建和配置FastAPI应用实例。
+"""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+{% if use_redis %}
+from app.utils.redis import get_redis_client
+{% endif %}
+from config.settings import settings
+from app.api.v1.api import api_router
+
+
+def create_app() -> FastAPI:
+    """
+    创建FastAPI应用实例
+    
+    Returns:
+        FastAPI: FastAPI应用实例
+    """
+    # 创建FastAPI应用实例
+    app = FastAPI(
+        title="{{ project_name }}",
+        description="{{ project_name }} API",
+        version="0.1.0",
+        {% if include_api_docs %}
+        openapi_url="/api/openapi.json",
+        docs_url="/api/docs",
+        redoc_url="/api/redoc",
+        {% else %}
+        openapi_url=None,
+        docs_url=None,
+        redoc_url=None,
+        {% endif %}
+    )
+    
+    # 配置CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    # 注册路由
+    app.include_router(api_router, prefix="/api")
+    
+    # 添加启动事件
+    @app.on_event("startup")
+    async def startup_event():
+        # 初始化数据库连接
+        pass
+    
+    # 添加关闭事件
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        # 关闭数据库连接
+        pass
+    
+    return app
+
+
+app = create_app()
+
+
+@app.get("/")
+async def root():
+    """
+    根路由，返回欢迎信息
+    """
+    return {"message": "Welcome to {{ project_name }} API"}

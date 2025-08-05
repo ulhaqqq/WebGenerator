@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+基础数据模型
+
+这个模块定义了基础数据模型。
+"""
+
+{% if database == 'sqlalchemy' %}
+from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy.ext.declarative import declared_attr
+from datetime import datetime
+
+from app.db.base import Base
+
+
+class BaseModel(Base):
+    """所有模型的基类"""
+    __abstract__ = True
+    
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+{% elif database == 'mongodb' %}
+from datetime import datetime
+from pydantic import BaseModel, Field
+from typing import Optional
+
+
+class MongoBaseModel(BaseModel):
+    """所有MongoDB模型的基类"""
+    id: Optional[str] = Field(None, alias="_id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat(),
+        }
+{% else %}
+# 基础数据模型
+# 根据您的数据库选择实现适当的基础模型
+{% endif %}

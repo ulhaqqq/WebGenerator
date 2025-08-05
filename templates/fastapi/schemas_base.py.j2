@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+基础数据模式
+
+这个模块定义了基础数据模式。
+"""
+
+from pydantic import BaseModel, Field
+from datetime import datetime
+from typing import Optional
+
+
+class BaseSchema(BaseModel):
+    """所有模式的基类"""
+    id: Optional[int] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    
+    class Config:
+        orm_mode = True

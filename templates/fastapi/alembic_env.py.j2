@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Alembic环境配置
+
+这个模块提供了Alembic的环境配置，用于数据库迁移。
+"""
+
+import asyncio
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import AsyncEngine
+
+# 导入配置和模型
+from config.settings import settings
+from app.db.base import Base
+
+# 导入所有模型，确保Alembic可以检测到它们
+# 这里需要导入所有定义了模型的模块
+try:
+    from app.models import item
+except ImportError:
+    pass
+
+{% if use_auth %}
+try:
+    from app.models import user
+except ImportError:
+    pass
+{% endif %}
+
+# 获取Alembic配置
+config = context.config
+
+# 设置日志配置
+fileConfig(config.config_file_name)
+
+# 设置目标元数据
+target_metadata = Base.metadata
+
+# 设置数据库URL
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+
+
+def run_migrations_offline() -> None:
+    """
+    在离线模式下运行迁移
+    
+    这不需要实际的数据库连接，只需要解析数据库URL并使用它来生成SQL。
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+    
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def do_run_migrations(connection) -> None:
+    """
+    运行迁移
+    """
+    context.configure(connection=connection, target_metadata=target_metadata)
+    
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_migrations_online() -> None:
+    """
+    在在线模式下运行迁移
+    
+    这需要一个实际的数据库连接。
+    """
+    # 创建异步引擎，使用 settings.DATABASE_URL
+    from sqlalchemy.ext.asyncio import create_async_engine
+    connectable = create_async_engine(
+        settings.DATABASE_URL,
+        poolclass=pool.NullPool,
+    )
+    
+    # 运行迁移
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
+    
+    await connectable.dispose()
+
+
+# 根据运行模式选择迁移函数
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    asyncio.run(run_migrations_online())

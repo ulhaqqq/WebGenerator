@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+数据库会话管理模块
+
+这个模块负责管理数据库连接和会话。
+"""
+
+from typing import AsyncGenerator
+
+from fastapi import Depends
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+
+from config.settings import settings
+
+# 创建数据库引擎
+{% if db_type == "mysql" %}
+DATABASE_URL = str(settings.DATABASE_URL).replace("mysql+pymysql", "mysql+aiomysql")
+{% elif db_type == "postgresql" %}
+DATABASE_URL = str(settings.DATABASE_URL).replace("postgresql", "postgresql+asyncpg")
+{% else %}
+DATABASE_URL = str(settings.DATABASE_URL).replace("sqlite:///", "sqlite+aiosqlite:///")
+{% endif %}
+
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    echo=settings.DEBUG,
+)
+
+# 创建会话工厂
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    获取数据库会话
+    
+    Yields:
+        AsyncSession: 数据库会话
+    """
+    async with SessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

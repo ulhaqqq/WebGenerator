@@ -1,0 +1,124 @@
+# {{ project_name }} 文档
+
+欢迎使用 {{ project_name }} 项目文档！
+
+## 项目概述
+
+{{ project_name }} 是一个使用 FastAPI 框架构建的 Web 应用程序。
+
+## 功能特点
+
+- 基于 FastAPI 的高性能 API
+- 自动生成的 API 文档 (Swagger UI 和 ReDoc)
+{% if database == 'sqlalchemy' %}
+- SQLAlchemy ORM 数据库集成
+- Alembic 数据库迁移
+{% elif database == 'mongodb' %}
+- MongoDB 数据库集成
+{% endif %}
+{% if use_redis %}
+- Redis 缓存支持
+{% endif %}
+{% if include_auth %}
+- JWT 认证系统
+- 用户管理功能
+{% endif %}
+- 健康检查接口
+- 完整的测试套件
+- Docker 容器化支持
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+### 配置环境变量
+
+编辑 `.env` 文件（已自动生成）并根据需要修改配置：
+
+```bash
+# .env 文件已自动生成，直接编辑即可
+```
+
+### 运行应用
+
+```bash
+python run.py
+```
+
+应用将在 http://localhost:8000 上运行。
+
+### API 文档
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## 项目结构
+
+```
+{{ project_name }}/
+├── app/                  # 应用代码
+│   ├── __init__.py
+│   ├── main.py           # 应用入口点
+│   ├── api/              # API 路由
+│   ├── models/           # 数据模型
+│   ├── schemas/          # Pydantic 模式
+│   ├── services/         # 业务逻辑
+│   ├── utils/            # 工具函数
+{% if database == 'sqlalchemy' or database == 'mongodb' %}
+│   └── db/               # 数据库配置
+{% endif %}
+├── config/              # 配置
+├── tests/               # 测试
+{% if database == 'sqlalchemy' %}
+├── migrations/          # 数据库迁移
+{% endif %}
+├── scripts/             # 脚本
+├── docs/                # 文档
+├── .env                 # 环境变量
+├── .env                 # 环境变量配置
+├── requirements.txt     # 依赖
+└── run.py               # 运行脚本
+```
+
+## 开发指南
+
+### 添加新的 API 端点
+
+1. 在 `app/api/` 目录下创建新的路由文件
+2. 在 `app/main.py` 中注册新的路由
+
+### 数据库操作
+
+{% if database == 'sqlalchemy' %}
+#### 创建新的数据库迁移
+
+```bash
+alembic revision --autogenerate -m "描述迁移内容"
+```
+
+#### 应用迁移
+
+```bash
+alembic upgrade head
+```
+{% elif database == 'mongodb' %}
+在 `app/models/` 目录下创建新的数据模型。
+{% endif %}
+
+## 部署
+
+### 使用 Docker
+
+```bash
+docker-compose up -d
+```
+
+这将启动应用及其依赖服务。
+
+## API 文档
+
+详细的 API 文档请参阅 [API 文档](api.md)。

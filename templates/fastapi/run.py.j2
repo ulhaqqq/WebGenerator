@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+应用入口点
+
+这个模块是应用的入口点，用于启动应用。
+"""
+
+import os
+import uvicorn
+
+if __name__ == '__main__':
+    # 启动应用
+    uvicorn.run(
+        "app.main:app",
+        host=os.getenv('API_HOST', '0.0.0.0'),
+        port=int(os.getenv('API_PORT', 8000)),
+        reload=os.getenv('API_ENV', 'development').lower() == 'development'
+    )

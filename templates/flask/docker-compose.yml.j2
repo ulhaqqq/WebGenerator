@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      {% if database == 'mysql' %}
+      - DATABASE_URL=mysql+pymysql://user:password@db/{{ project_name }}
+      {% else %}
+      - DATABASE_URL=postgresql://user:password@db/{{ project_name }}
+      {% endif %}
+      {% if use_redis %}
+      - REDIS_URL=redis://redis:6379/0
+      {% endif %}
+    depends_on:
+      - db
+      {% if use_redis %}
+      - redis
+      {% endif %}
+    volumes:
+      - ./:/app
+
+  db:
+    {% if database == 'mysql' %}
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE={{ project_name }}
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    {% else %}
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB={{ project_name }}
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    {% endif %}
+
+  {% if use_redis %}
+  redis:
+    image: redis:6
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+  {% endif %}
+
+volumes:
+  db_data:
+  {% if use_redis %}
+  redis_data:
+  {% endif %}

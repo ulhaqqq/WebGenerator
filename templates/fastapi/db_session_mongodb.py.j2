@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+MongoDB数据库会话
+
+这个模块提供了MongoDB数据库会话管理。
+"""
+
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.database import Database
+
+from config.settings import settings
+
+# 创建MongoDB客户端
+client = AsyncIOMotorClient(settings.MONGODB_URL)
+db = client[settings.MONGODB_DB_NAME]
+
+
+def get_database() -> Database:
+    """
+    获取数据库实例
+    
+    Returns:
+        MongoDB数据库实例
+    """
+    return db
