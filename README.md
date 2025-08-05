@@ -44,24 +44,17 @@
 
 **macOS:**
 ```bash
-# 安装tkinter支持（如果使用tkinter界面）
-brew install python-tk
-
 # 如需使用mysqlclient（高性能MySQL驱动）
 brew install mysql pkg-config
 ```
 
 **Ubuntu/Debian:**
 ```bash
-# 安装tkinter支持
-sudo apt-get install python3-tk
-
 # 如需使用mysqlclient
 sudo apt-get install libmysqlclient-dev pkg-config
 ```
 
 **Windows:**
-- tkinter通常已预装在Python中
 - 推荐使用PyMySQL（已包含在requirements.txt中）
 
 ### 快速安装
