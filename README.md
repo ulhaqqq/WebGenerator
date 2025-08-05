@@ -197,8 +197,8 @@ my_fastapi_project/
 
 ```bash
 # 克隆你的fork
-git clone https://github.com/your-username/web-generator.git
-cd web-generator
+git clone https://github.com/zketer/WebGenerator.git
+cd WebGenerator
 ```
 
 ## 🧪 开发
